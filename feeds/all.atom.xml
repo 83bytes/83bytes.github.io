@@ -1,0 +1,1133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>SignalShore</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-12-20T00:00:00+05:30</updated><entry><title>Scheme - Part 3 - Higher Order Procedures (intro)</title><link href="/blog/Scheme-Part-3.html" rel="alternate"></link><published>2017-12-20T00:00:00+05:30</published><updated>2017-12-20T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-12-20:/blog/Scheme-Part-3.html</id><summary type="html">&lt;h3&gt;Higher Order procedures&lt;/h3&gt;
+&lt;p&gt;&lt;s&gt;Lisp is a functional programming language&lt;/s&gt;&lt;/p&gt;
+&lt;p&gt;Lisp is a &lt;a href="https://en.wikipedia.org/wiki/Metaprogramming"&gt;Metaprogramming Language&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Actually, I really don't know what Lisp is myself and I'm just trying
+to figure it out; so the answer to the question "What programming
+paradigm does Lisp fall into ?" will have to wait for some …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Higher Order procedures&lt;/h3&gt;
+&lt;p&gt;&lt;s&gt;Lisp is a functional programming language&lt;/s&gt;&lt;/p&gt;
+&lt;p&gt;Lisp is a &lt;a href="https://en.wikipedia.org/wiki/Metaprogramming"&gt;Metaprogramming Language&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Actually, I really don't know what Lisp is myself and I'm just trying
+to figure it out; so the answer to the question "What programming
+paradigm does Lisp fall into ?" will have to wait for some time. I'm
+sure that I can quote some website or blog but I want to figure it out
+myself. I used to think that Lisp was a functional programming
+language but turns out it's not according to the strictest definitions
+of functional programming and some other reasons that I do not yet
+understand fully.&lt;/p&gt;
+&lt;p&gt;It's slow but I'm getting there. :-)&lt;/p&gt;
+&lt;p&gt;Anyway for this post we need to know that in Lisp we
+have
+&lt;a href="https://en.wikipedia.org/wiki/First-class_function"&gt;first class functions&lt;/a&gt;,
+which is basically functions being treated
+as
+&lt;a href="https://en.wikipedia.org/wiki/First-class_citizen"&gt;first class citizens&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In Scheme this is achieved using Higher Order procedures. &lt;/p&gt;
+&lt;p&gt;In this post I am using functions and procedures interchangeably
+because in this context (lisp) everything is a function and there is
+not much difference, however the meanings may vary depending on which
+programming language family you are talking about, for example in
+Pascal procedures and functions are distance and have different
+ meanings. In the book functions refer to mathematical functions and
+procedures mean Lisp procedures.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Higher-order_function"&gt;Wikipedia&lt;/a&gt;
+defines higher order functions as something that does at least one of
+the following
+- Take one or more functions as arguments
+- Return a function as its result&lt;/p&gt;
+&lt;p&gt;From the SICP book Page 57 defines higher order procedures as&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;procedures that manipulate other procedures&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;We will look at the first point in this post today. The topics are too
+dense for a single post.&lt;/p&gt;
+&lt;h3&gt;Procedures as arguments&lt;/h3&gt;
+&lt;p&gt;Instead of just jumping right in, allow me to use an example that will
+inspire the idea of procedures that take procedures as arguments.&lt;/p&gt;
+&lt;p&gt;Let us look at this mathematical expression and write a procedure for it.&lt;/p&gt;
+&lt;div class="math"&gt;$$ Sum = 1 + 2 + 3 + 4 + \dots +  \infty $$&lt;/div&gt;
+&lt;p&gt;The Lisp procedure to compute this would be like &lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum-integers&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="mi"&gt;0&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum-integers&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum-integers&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;;; prints 15&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;Now let us look at this expression &lt;/p&gt;
+&lt;div class="math"&gt;$$ Sum = 1^3 + 2^3 + 3^3 + \dots + \infty $$&lt;/div&gt;
+&lt;p&gt;This is a series of the sum of cubes. The procedure would look like this&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum-cubes&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="mi"&gt;0&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;cube&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum-cubes&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;If we observer closely we can see that there is an uncanny similarity
+between the two procedures and such a similarity indicates that there
+is some abstraction that needs further investigation. If you think
+about it, in both the previous examples we are computing the sum of
+different terms. If we can capture the idea of &lt;code&gt;summing&lt;/code&gt; in a
+procedure then that would give us the required
+abstraction. Mathematicians have done this using the &lt;span class="math"&gt;\(\Sigma\)&lt;/span&gt;
+notation. The Sigma notation captures the idea of the summation
+without knowing what we are summing. Thus the above two expressions
+can be rewritten as :&lt;/p&gt;
+&lt;div class="math"&gt;$$ \sum_{n=1}^\infty n = 1 + 2 + 3 + \dots + \infty $$&lt;/div&gt;
+&lt;p&gt;and &lt;/p&gt;
+&lt;div class="math"&gt;$$ \sum_{n=1}^\infty n^3 = 1^3 + 2^3 + 3^3 + \dots + \infty $$&lt;/div&gt;
+&lt;p&gt;This lets us capture the idea of summation in the Sigma notation like &lt;/p&gt;
+&lt;div class="math"&gt;$$ \sum_{n=a}^b f(n) = f(a) + \dots + f(b) $$&lt;/div&gt;
+&lt;p&gt;and we can use that idea to write a procedure; like so..&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum&lt;/span&gt; &lt;span class="nv"&gt;term&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="mi"&gt;0&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;term&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum&lt;/span&gt; &lt;span class="nv"&gt;term&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt; &lt;span class="c1"&gt;;; (next a) updates the a&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;In the above procedure "term" and "next" are procedures too.  Term is
+a procedure that computes the value of each term. This procedure is
+the Lisp equivalent of the function &lt;span class="math"&gt;\(f(x)\)&lt;/span&gt; in the mathematical
+Sigma notation. Next is a procedure that determines how the function
+will iterate.&lt;/p&gt;
+&lt;p&gt;Thus for &lt;span class="math"&gt;\(\sum_{n=1}^\infty n^3 = 1^3 + 2^3 + 3^3 + \dots + \infty\)&lt;/span&gt;
+the Lisp procedure would be&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;cube&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;* &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum-cube&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;sum&lt;/span&gt; &lt;span class="nv"&gt;cube&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;;; sum is defined above&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;This is not the end. We can use this idea to create multiple such abstractions. &lt;/p&gt;
+&lt;p&gt;For example the multiplication procedure &lt;span class="math"&gt;\(\coprod_{n=a}^b f(n) = f(a) * \dots * f(b)\)&lt;/span&gt; can be coded like&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;product&lt;/span&gt; &lt;span class="nv"&gt;term&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="mi"&gt;1&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;term&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+           &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;product&lt;/span&gt; &lt;span class="nv"&gt;term&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;We can use the multiplication abstraction to calculate factorials.&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;factorial&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;product&lt;/span&gt; &lt;span class="nv"&gt;identity&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;;;defined above&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;factorial&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;                  &lt;span class="c1"&gt;;; prints 120&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;Now we can see another uncanny similarity between this procedure and
+the summation procedure. Thus we can define another procedure called
+the &lt;code&gt;accumulate&lt;/code&gt; and abstract away the idea of summation and
+multiplication into two different methods of doing the same thing;
+accumulating.&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;accumulate&lt;/span&gt; &lt;span class="nv"&gt;combiner&lt;/span&gt; &lt;span class="nv"&gt;null-value&lt;/span&gt; &lt;span class="nv"&gt;term&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;null-value&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;combiner&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;term&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;accumulate&lt;/span&gt; &lt;span class="nv"&gt;combiner&lt;/span&gt; &lt;span class="nv"&gt;null-value&lt;/span&gt; &lt;span class="nv"&gt;term&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;indentity&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;next&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;accumulate&lt;/span&gt; &lt;span class="nv"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="nv"&gt;identity&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;;; prints 15&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;accumulate&lt;/span&gt; &lt;span class="nv"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="nv"&gt;identity&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="nv"&gt;next&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;;; prints 120&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;The &lt;code&gt;combiner&lt;/code&gt; in the above procedure is a procedure that takes in two inputs and combines them. For addition this is &lt;code&gt;+&lt;/code&gt; and for multiplication this is &lt;code&gt;*&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;null-value&lt;/code&gt; is the value to be used when the range runs out. This is same the the value used the &lt;code&gt;(&amp;gt; a b)&lt;/code&gt; evaluates to false.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;This is the beginning of the chapter in the book that deals with this stuff
+&lt;a href="https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-12.html#%_sec_1.3"&gt;Book&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This post turned out to be bigger than I anticipated. In the next post
+we will look at procedures returning procedures as the result. &lt;/p&gt;
+&lt;p&gt;p.s. this implies that higher order procedures can program programs in
+some sense. ;-)&lt;/p&gt;
+&lt;p&gt;p.p.s This was mighty amazing. I took about 1 minute
+to write the accumulate procedure. I took about 2 weeks to fully
+understand the sum procedure. I think I am getting a hang of this
+thing!!!&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="CS"></category><category term="Scheme"></category></entry><entry><title>Scheme - Part 2 - Expressions and Evaluations</title><link href="/blog/Scheme-Part-2.html" rel="alternate"></link><published>2017-11-30T00:00:00+05:30</published><updated>2017-11-30T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-11-30:/blog/Scheme-Part-2.html</id><summary type="html">&lt;h3&gt;S-expressions&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/S-expression"&gt;S-expressions&lt;/a&gt; or Sexprs or Symbolic Expressions are used to
+represented list like data. This was invented for and popularized by
+LISP. Lisp stands for LISt Processing. &lt;/p&gt;
+&lt;p&gt;A list looks like this &lt;code&gt;(x y ... z)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;A list can be made up of other lists as well. Like so &lt;code&gt;(x (a …&lt;/code&gt;&lt;/p&gt;</summary><content type="html">&lt;h3&gt;S-expressions&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/S-expression"&gt;S-expressions&lt;/a&gt; or Sexprs or Symbolic Expressions are used to
+represented list like data. This was invented for and popularized by
+LISP. Lisp stands for LISt Processing. &lt;/p&gt;
+&lt;p&gt;A list looks like this &lt;code&gt;(x y ... z)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;A list can be made up of other lists as well. Like so &lt;code&gt;(x (a b c) (d e f))&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;In Lisp (and any other lisps) every program is a represented as a
+list. In-fact this is the one and only style of writing programs in
+LISP and this leads to some very interesting properties of lisp
+programs.
+1. Data and instructions (that work on the data) have similar
+   representation within the program structure.
+2. You have to pay close attention to evaluation models or how each
+   list is evaluated.
+3. The whole program can be represented as a tree.&lt;/p&gt;
+&lt;h3&gt;Program Structure of Lisp&lt;/h3&gt;
+&lt;p&gt;If we look at the structure of a LISP program we will notice that
+there is not proper structure to the code other than the usual LIST
+structure and everything within that language (from variables to
+procedure calls) are represented with the same structure. This is
+interesting because this is directly related to the kind of computing
+model this language is based on. Lisp is based on a model of computing
+called &lt;a href="https://en.wikipedia.org/wiki/Lambda_calculus"&gt;Lambda Calculus&lt;/a&gt;. It was invented by &lt;a href="https://en.wikipedia.org/wiki/Alonzo_Church"&gt;Alonzo Church&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;On the other hand procedural and object oriented languages are based
+on a model of computing called the &lt;a href="https://en.wikipedia.org/wiki/Turing_machine"&gt;Turing Machine&lt;/a&gt;. In these
+languages there is some structure that lets us differentiate between
+what is code and what is data, but that is not the case in
+Lisp. Infact in Lisp code is treated as data in the form of &lt;a href="https://en.wikipedia.org/wiki/Higher-order_function"&gt;higher
+order procedures&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Lisp programs are trees. In other words the lists can be represented
+as tree such that
+- Every list within a pair of &lt;em&gt;(&lt;/em&gt;  &lt;em&gt;)&lt;/em&gt; is treat as a node in the tree
+- The very first element of every list is the first child of that node
+  in the tree. This is the operator.
+- Every other element of that list is a child of that node and are the
+  operators for that operand.&lt;/p&gt;
+&lt;p&gt;The tree of the expression &lt;code&gt;(+ 2 3)&lt;/code&gt; will look like this&lt;/p&gt;
+&lt;p&gt;&lt;img alt="single tree" src="/assets/images/2017-11-30/single.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;A LISP program is very easily parse-able by a computer as Trees do
+not need complicated rules for traversal and other operations. In-fact
+this sounds almost similar to the parse-tree of a
+&lt;a href="https://en.wikipedia.org/wiki/Context-free_grammar"&gt;Context-Free Grammar&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;blue&gt;The Substitution Model&lt;/blue&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This is probably one of the most simplest models of evaluation. It is
+also very powerful. It is also recursive in nature. Let us write a
+basic definition of the Evaluator.&lt;/p&gt;
+&lt;p&gt;Let the Evaluator be &lt;code&gt;E&lt;/code&gt;. It accepts an expression as input and
+evaluates it. Let the expression be &lt;code&gt;expr&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;On receiving an expression &lt;em&gt;expr&lt;/em&gt; evaluate the sub-expressions (using
+  the same model; so this is a recursive call to &lt;em&gt;&lt;code&gt;E(sub_expr)&lt;/code&gt;&lt;/em&gt; where
+  &lt;em&gt;sub_expr&lt;/em&gt; is the sub expression)&lt;/li&gt;
+&lt;li&gt;Apply the results of the sub-lists as operands to the operator of this list.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In list the first element of any List is treated as the operator while
+the rest are treated as the operands.&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;;; + is the operator and 2, 3, 4 are the operands&lt;/span&gt;
+&lt;span class="nv"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;9&lt;/span&gt;
+&lt;span class="nv"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;* &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;;; * is the operator and 2, 3, 4 are the operands&lt;/span&gt;
+&lt;span class="nv"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;24&lt;/span&gt;
+&lt;span class="nv"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;   &lt;span class="c1"&gt;;; &amp;gt; is the operator; this is equivalent to 2 &amp;gt; 3 &lt;/span&gt;
+&lt;span class="nv"&gt;&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;f&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;This also applied for lists that have other lists in them. Let's have
+a look!&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+ &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;9&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;Let us trace what happens here.  First the evaluator receives the
+expression &lt;code&gt;(+ 2 4 (+ 2 2))&lt;/code&gt; and then it evaluates the internal list
+first. Which is &lt;code&gt;(+ 2 2)&lt;/code&gt;. This expression evaluates to &lt;code&gt;4&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In the tree form this is how the above expression would look&lt;/p&gt;
+&lt;p&gt;&lt;img alt="double" src="/assets/images/2017-11-30/double.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Then the evaluator &lt;em&gt;substitutes&lt;/em&gt; that result to the actual expression
+before continuing on with the evaluation. So now the expression looks
+like this &lt;code&gt;(+ 2 4 4)&lt;/code&gt; and then we get the final answer.&lt;/p&gt;
+&lt;h3&gt;Evaluation Strategies&lt;/h3&gt;
+&lt;p&gt;Lisp uses an &lt;a href="https://en.wikipedia.org/wiki/Evaluation_strategy#Applicative_order"&gt;Eager evaluation&lt;/a&gt; strategy. This is also known as Strict
+Evaluation or Applicative evaluation. In this strategy all the
+operands are evaluated first before applying them to the function.&lt;/p&gt;
+&lt;p&gt;In lisp this is the only structure that we have. So conditional
+branching (if-else, case). The if-construct in LISP looks like this.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;(if (expression) (expression1) (expression2))&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Now the &lt;em&gt;if&lt;/em&gt; macro is special because it does not follow the normal
+evaluation strategy i.e. all the three expressions &lt;em&gt;expression&lt;/em&gt;,
+&lt;em&gt;expression1&lt;/em&gt; and &lt;em&gt;expression2&lt;/em&gt; are not evaluated before the procedure
+is applied. In this macro only the first expression (&lt;em&gt;expression&lt;/em&gt;) is
+evaluated first and if it evaluates to be true (&lt;em&gt;#t&lt;/em&gt;) then
+&lt;em&gt;expression1&lt;/em&gt; will be evaluated. Otherwise &lt;em&gt;expression2&lt;/em&gt; will be
+evaluated.&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;recursive&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;= &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="mi"&gt;0&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;recursive&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;- &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;recursive&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;What happens when we evaluate the last expression ? Nothing
+spectacular. We just get the value &lt;code&gt;0&lt;/code&gt; which is what it is supposed to
+do. We get this answer only because LISP uses normal order evaluation
+(lazy evaluation) for the &lt;em&gt;if&lt;/em&gt; construct. If like the default strategy
+it used applicative order evaluation then both the &lt;code&gt;0&lt;/code&gt; and the &lt;code&gt;(recursive
+(- x 1))&lt;/code&gt; would be evaluated before calling the procedure and that
+would lead to an infinite loop. But the if-constructs uses &lt;a href="https://en.wikipedia.org/wiki/Evaluation_strategy#Non-strict_evaluation"&gt;Normal order&lt;/a&gt; evaluation or non-strict evaluation.&lt;/p&gt;
+&lt;p&gt;My next program will illustrate this. For that we will define a
+&lt;code&gt;new-if&lt;/code&gt; procedure that will do exactly what &lt;code&gt;if&lt;/code&gt; does.&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;new-if&lt;/span&gt; &lt;span class="nv"&gt;predicate&lt;/span&gt; &lt;span class="nv"&gt;exp1&lt;/span&gt; &lt;span class="nv"&gt;exp2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; 
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;cond &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;predicate&lt;/span&gt; &lt;span class="nv"&gt;exp1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;else &lt;/span&gt;&lt;span class="nv"&gt;exp2&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;This is the &lt;em&gt;new-if&lt;/em&gt; procedure. Let us use this in our previous program.&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;recursive-new&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;new-if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;= &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="mi"&gt;0&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;recursive-new&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;- &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;recursive-new&lt;/span&gt; &lt;span class="nv"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;What happens now ? &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;NOW&lt;/strong&gt; the thing goes into a spectacular infinite loop. That is
+because the &lt;em&gt;new-if&lt;/em&gt; procedure will be evaluated using the applicative
+order strategy. Thus all the operands will be evaluated before the
+&lt;em&gt;new-if&lt;/em&gt; procedure is called; and &lt;em&gt;recursive-new&lt;/em&gt; has a call to
+itself. So in the end it all splatters exceptionally well.&lt;/p&gt;
+&lt;p&gt;P.S. I have written this post based on my own
+experience which is a very very limited one. I do not claim that what
+I have just said is the ultimate truth or the &lt;em&gt;only&lt;/em&gt; thing out
+there. My short life and my shorter experience with LISP is not nearly
+enough to cover the full depth and breadth of LISP&lt;/p&gt;</content><category term="CS"></category><category term="Scheme"></category></entry><entry><title>Scheme - Part 1 - Wishful Thinking and Abstraction</title><link href="/blog/Scheme-Part-1.html" rel="alternate"></link><published>2017-11-20T00:00:00+05:30</published><updated>2017-11-20T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-11-20:/blog/Scheme-Part-1.html</id><summary type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I started
+learning
+&lt;a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)"&gt;LISP&lt;/a&gt;
+(actually a dialect of LISP
+called
+&lt;a href="https://en.wikipedia.org/wiki/Scheme_(programming_language)"&gt;Scheme&lt;/a&gt;)
+about 1 year back. The inspiration for learning Scheme was that it is
+a completely new programming paradigm
+i.e. &lt;a href="https://en.wikipedia.org/wiki/Functional_programming"&gt;functional programming&lt;/a&gt; language
+and I wanted to learn a non-Object-Oriented programming
+language. Anyway, so I looked
+at
+&lt;a href="https://en.wikipedia.org/wiki/Haskell_(programming_language)"&gt;Haskell …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I started
+learning
+&lt;a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)"&gt;LISP&lt;/a&gt;
+(actually a dialect of LISP
+called
+&lt;a href="https://en.wikipedia.org/wiki/Scheme_(programming_language)"&gt;Scheme&lt;/a&gt;)
+about 1 year back. The inspiration for learning Scheme was that it is
+a completely new programming paradigm
+i.e. &lt;a href="https://en.wikipedia.org/wiki/Functional_programming"&gt;functional programming&lt;/a&gt; language
+and I wanted to learn a non-Object-Oriented programming
+language. Anyway, so I looked
+at
+&lt;a href="https://en.wikipedia.org/wiki/Haskell_(programming_language)"&gt;Haskell&lt;/a&gt;
+as its a purely functional programming language, but I picked Scheme
+because of the
+book
+&lt;a href="https://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;Structure and Interpretation of Computer Programs&lt;/a&gt; (referred
+to as SICP hereafter).&lt;/p&gt;
+&lt;h3&gt;What is this ?&lt;/h3&gt;
+&lt;p&gt;Even though I started about 1 year back I did not make much progress
+and I realized that one of the main reasons was that I was not doing
+the exercises with enough rigor. Thinking about a solution is very
+different than writing an actual program. So I decided that I would do
+the exercises and put them
+on &lt;a href="https://gitlab.com/83bytes"&gt;Gitlab&lt;/a&gt; and then write about
+them. Furthermore during this course of learning Scheme I've come
+across a lot of cool stuff that completely changed the way how I
+approached computer science and programming in general. I want to
+share those.&lt;/p&gt;
+&lt;h3&gt;Lets start&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Let us write a program&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="sum pic" src="/assets/images/2017-11-20/sum.png"&gt;&lt;/p&gt;
+&lt;p&gt;(these are cropped screen-shots of Emacs)&lt;/p&gt;
+&lt;p&gt;This program takes three numbers and adds them. This is also how the
+scheme syntax looks. Scheme syntax is
+just &lt;a href="https://en.wikipedia.org/wiki/S-expression"&gt;S-expressions&lt;/a&gt; or
+symbolic expressions.&lt;/p&gt;
+&lt;p&gt;Thinking about S-expressions is easy. 
+- Starting from the first "(" the first element is the operator
+- Everything that comes after the first operator are the operands
+- The end is the closing bracket ")"&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How about a procedure (scheme word for functions)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;In scheme we use the "define" keyword to define a procedure.&lt;/p&gt;
+&lt;p&gt;Its syntax is like this &lt;code&gt;(define (&amp;lt;name&amp;gt; &amp;lt;formal parameters) (&amp;lt;body&amp;gt;))&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Let us define a procedure&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="sumProcedure" src="/assets/images/2017-11-20/procedureSum.png"&gt;&lt;/p&gt;
+&lt;p&gt;This is how the procedure looks. The name of the procedure is "sum" and it takes in two numbers and produces their sum.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Let us write something a bit complicated&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="sumOfSquare" src="/assets/images/2017-11-20/sumOfSquares.png"&gt;&lt;/p&gt;
+&lt;p&gt;This procedure uses the previous "sum" procedure to compute the sum of
+the square of two numbers. I this process you should see another
+procedure that we have defined which is called "square". This is an
+accessory procedure. We could have no used it and it wouldn't have
+mattered too much. &lt;/p&gt;
+&lt;p&gt;&lt;em&gt;NOW!! here is the kicker! :-P&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Imagine for a second that you did
+not know how addition, multiplication, division etc worked. You could
+still define the procedure "sumOfSquares" knowing that you have
+procedures called "sum" and "square" that will take care of the
+internal operations for you.&lt;/p&gt;
+&lt;p&gt;What this enables you to do is do a top down design approach to
+things.  While designing apps (nothing too big) in C++ I found myself
+being too worried about what were all the small parts the should make
+up the program, But after starting to read this book apart from
+learning scheme I also learned this model of thinking.&lt;/p&gt;
+&lt;p&gt;The writers call this "wishful thinking"; as in you wish that
+something existed and then used it as if it existed. Then you tried to
+figure out if it did exist in the first place or not. If it does exist
+then fine; otherwise you design one.&lt;/p&gt;
+&lt;p&gt;Which means that if at any point while designing a software you are
+un-sure about all sub-modules that will be required to make that
+module work then you do not start designing the sub-modules and build
+up from there. Instead you design the current module and then design
+the sub-modules to match the requirement set up by the module. This is
+top-down design approach.&lt;/p&gt;
+&lt;p&gt;For example when designing "sumOfSquares" you need not think about how
+you will implement it. You can just write the code and then you can
+sit down and figure out how "sum" and "square" would work. At the time
+of writing the sumOfSquare you do not know if &lt;em&gt;sum&lt;/em&gt; and &lt;em&gt;square&lt;/em&gt;
+exist. You just use them as if they did existed.&lt;/p&gt;
+&lt;p&gt;This also means that while wiring the sumOfSquare procedure you need
+not bother about how &lt;em&gt;sum&lt;/em&gt; and &lt;em&gt;square&lt;/em&gt; will be implemented. You can
+just use them as it is.&lt;/p&gt;
+&lt;p&gt;This brings me to my next point. &lt;/p&gt;
+&lt;h3&gt;Abstraction&lt;/h3&gt;
+&lt;p&gt;Every procedure is like a layer of abstraction that is telling you to
+not worry about how it works and instead focus on the task at hand.
+This idea is immensely helpful. Its so simple. If you don't know how
+to do something; just write a procedure that does it; then worry about
+the procedure later.&lt;/p&gt;
+&lt;p&gt;I didn't think much about this until recently when I started doing
+the exercises in the book more seriously. Its great once you get the
+hang of it.&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;This is not the I have more things to share. Hopefully I will be able
+to write about them soon. :-P&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://gitlab.com/83bytes/sicp"&gt;Here&lt;/a&gt; is the Gitlab Repo where I will keep uploading my SICP exercises.&lt;/p&gt;</content><category term="CS"></category><category term="Scheme"></category></entry><entry><title>My First 100km Bicycle Ride</title><link href="/blog/My-First-100-km-Bicycle-Ride.html" rel="alternate"></link><published>2017-11-08T00:00:00+05:30</published><updated>2017-11-08T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-11-08:/blog/My-First-100-km-Bicycle-Ride.html</id><summary type="html">&lt;p&gt;Last Thursday (2 November, 2017) I completed my longest cycling ride
+(yet!). It was tiring and awesome at the same time. It took 7 hours to
+complete that too with multiple stops in the middle of the ride.&lt;/p&gt;
+&lt;h3&gt;The Motivation&lt;/h3&gt;
+&lt;p&gt;I've been planning to do a 100k ride for a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Last Thursday (2 November, 2017) I completed my longest cycling ride
+(yet!). It was tiring and awesome at the same time. It took 7 hours to
+complete that too with multiple stops in the middle of the ride.&lt;/p&gt;
+&lt;h3&gt;The Motivation&lt;/h3&gt;
+&lt;p&gt;I've been planning to do a 100k ride for a long time but I didn't
+really got to it because something or the other always came up and I
+was being very very lazy. However a lot of things changed in the last
+week and most importantly me and my brother(who also happens to be an
+avid bicycling fan based in Kolkata) are planning to go riding when I
+visit my hometown in Kolkata. Thus I thought that it would be a good
+idea to get some miles under my belt.&lt;/p&gt;
+&lt;h3&gt;The Planning&lt;/h3&gt;
+&lt;p&gt;This was the easiest part to decide. I was very sure that I did not
+want to do a 50 km ride; I wanted something bigger. So i decided to do
+a 100+ km ride. The destination was Tumkur because that was the only
+town near to Bangalore with a perfect distance for this ride. Tumkur
+is 60kms from Bangalore (this distance is from my hostel which happens
+to be on the border of Bangalore (so to speak)).&lt;/p&gt;
+&lt;p&gt;I could've chosen a route inside Bangalore but I did not do that
+because
+- Being within the city is like a safety net. There is always the
+  possibility of taking an auto and calling it a day.
+- Bangalore streets are very shitty to ride on. Its the weird
+  combination of the condition of the roads and the multitude of
+  moronic motorists.
+- Whenever I try something new and bold I like not having any easy
+  backup options as I have found that this combination of "no easy
+  backups" and "difficult task" are very good and they help me
+  grow. :-)&lt;/p&gt;
+&lt;p&gt;The road to Tumkur is a National Highway and is very very
+straight. Thus there was nothing that could go spectacularly wrong
+other than myself getting killed on the Highway. Honestly I think that
+the chances of me getting hit by a car and killed is way more in the
+city than on the Highway. Also there was no issue of getting lost on
+the way and I was very prepared for any punctures and other equipment
+related hiccups.&lt;/p&gt;
+&lt;h3&gt;The Nutrition&lt;/h3&gt;
+&lt;p&gt;I carried peanut brittle because its made of peanuts which is mighty
+healthy and it also had jaggery which is a better form of consuming
+sucrose as the rate of absorption of sucrose into the body is
+regulated in jaggery since it has fiber. So I figured that with each
+peanut Brittle I would get a steady and sustainable flow of glucose
+(sucrose breaks down into glucose and fructose). (this is not based on
+any scientific research. This is just based on what I have learned
+about refined and unrefined sugar and 2+2=4 )&lt;/p&gt;
+&lt;p&gt;I also had a jam-bread when I reached tumkur. &lt;/p&gt;
+&lt;p&gt;I also had a coconut water on the way. It was very very refreshing
+especially after sweating and all. I feel that this was very important
+as it helped replenish a lot of depleted electrolytes.&lt;/p&gt;
+&lt;p&gt;I ate two bananas before starting because I couldn't resist the
+temptation. :-P&lt;/p&gt;
+&lt;h3&gt;Packing&lt;/h3&gt;
+&lt;p&gt;This was a very interesting part where I found myself performing
+calculations so that I could carry the most effective load in the most
+efficient manner.&lt;/p&gt;
+&lt;p&gt;This is one of the most important parts of the trip because without
+the correct stuff you might find yourself unprepared for a wide range
+of possible situations out on a trip at a location where finding
+relevant help would be very difficult.&lt;/p&gt;
+&lt;p&gt;You also do not want to carry too much extra stuff because every added
+gram means more weight on your shoulders. This is not a big deal but,
+when you factor in the fact that I do not have a Pannier rack and I
+have to carry all that stuff a shoulder bag it means all that load
+will be resting on the small bones on my butt that in turn would rest
+on that saddle. Factor in the distance (100km+) and time (6hrs+) of
+cycling and you have the perfect recipe for a sore butt.&lt;/p&gt;
+&lt;p&gt;I did not carry/wear any jackets since the waste heat from my body
+would eventually heat me up.&lt;/p&gt;
+&lt;p&gt;Anyway after solving the Linear Programming Problem I found the
+optimum carrying requirements
+- Food (Peanut Brittle)
+- 1.75 Liters of Water (1L + 750ml)
+- Tyre repair kit (Patches + Glue + Tyre levers + sand Paper)
+- Emergency tools (multi tool + Single Hex Key)
+- A spare inner tube (for those un-repairable punctures)
+- Portable Pump
+- Btwin Saddle Bag
+- 2 Bananas (I ate these for breakfast so I don't think I should count them)
+- Pen and Notepad
+- My Phone
+- A cap
+- My helmet&lt;/p&gt;
+&lt;p&gt;Here is the full inventory laid out for a photo. Note that the tube is
+missing because I forgot to keep it
+there.  &lt;img alt="Stuff I carried" src="/assets/images/2017-11-08/contents.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;I fit a bottle holder on the cycle and put a 1 Liter bottle
+there. Also I used an attachment to fix the portable pump onto the
+frame of the cycle itself. So in the end I was carrying about 2
+Kilograms including the weight of the bag which is not too bad.&lt;/p&gt;
+&lt;h3&gt;The TRIP!!!&lt;/h3&gt;
+&lt;p&gt;Before this trip I was kinda scared of solo trips; and I would always
+go out with Arun on longer rides. But I realized that at some point I
+would have to go out myself and I love beign alone so I went on with
+it. I was so scared before this ride that I was hoping that Arun would
+not be able to let me borrow his backup gear for this ride and so I
+would have a reason to cancel it. :-P&lt;/p&gt;
+&lt;p&gt;BUT soon the alarm rang at 4 o'clock in the morning and it was time
+for me to get going. So I woke up; checked the cycle for any defects,
+checked the indexing of the gears, loaded up the gears, dressed up for
+the event and Left. :-P I left at 5:30 in the morning which was a mere
+half hour behind schedule.&lt;/p&gt;
+&lt;p&gt;This is how it looked fully loaded.
+&lt;img alt="Fully Loaded" src="/assets/images/2017-11-08/fullyLoaded.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;The first leg of the journey was amazing without any hiccups. The
+weather was amazing, it was cool and the sun was merciful. I crossed
+the "Welcome to Tumkur" sign on the highway at 8:22. So this leg took
+exactly 3 hours with two stop in the middle (I stopped to have a
+Peanut Brittle and to have coconut water :-P ) which gives me an
+average speed of 20 kmph which is not at all bad especially if we
+consider the fact this is my first 100km ride and my third long
+distance ride in my life (yes!!).&lt;/p&gt;
+&lt;p&gt;Here is a pic. :-P
+&lt;img alt="Welcome to Tumkur" src="/assets/images/2017-11-08/welcomeToTumkur.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Then I stopped at a bakery to have some jam-bun (white-bread + jam)
+which was good decision as I think that this gave me more than enough
+energy and also some well-needed rest for my legs. I also refilled my
+water bottle. I had used only about 750ml out of the total water that
+I was carrying.&lt;/p&gt;
+&lt;p&gt;Weird thing. There was a distance marker at Tumkur that said that
+Bangalore was 70kms from that point. Here it is.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="weird distance marker" src="/assets/images/2017-11-08/signBoard1.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;This was very unsettling because this was weird, conflicting and new
+information. Then it hit me that maybe what is Bangalore and what is
+Tumkur is not fixed. Maybe they were measuring Bangalore from that
+location to some place that was not where I was measuring Bangalore
+to. So i was relieved. :-P&lt;/p&gt;
+&lt;p&gt;I started from Tumkur after about 15 mins. This is the part where
+things started to get ugly. The weather was bad, it was hot and the
+sun was not merciful. I soon realized how tired I was and there was a
+slight uphill climb just outside Tumkur (around 10km from
+Tumkur). This proved to be a huge challenge. I couldn't do it. So I
+ended up pushing the cycle for about 1 km. This was a relief at that
+moment. This continued for sometime. I think I stopped and pushed or
+stopped and sat down under a tree (btw trees are amazing on a highway
+especially on a sunny day) for multiples times. I think I had to push
+my cycle about 4 or 5 times. I did not push them too much, maybe just
+about 1 km or so. But yeah these were some well needed rests.&lt;/p&gt;
+&lt;p&gt;This is a pic when I was resting under a tree. 
+&lt;img alt="Random Stop" src="/assets/images/2017-11-08/randomStop.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;I reached my hostel at 12:30 which was over 6 hours. I am actually very
+surprised that I managed to maintain a decent 20kmps overall. :-P&lt;/p&gt;
+&lt;h3&gt;PHOTOS!!!&lt;/h3&gt;
+&lt;p&gt;Did I mention that I took photos :-P ? (I absolutely love the camera
+in this new phone :-) )&lt;/p&gt;
+&lt;p&gt;This was just before starting right in front of my hostel gate.
+&lt;img alt="Starting" src="/assets/images/2017-11-08/justStarting.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;This was a random location where I stopped
+&lt;img alt="random" src="/assets/images/2017-11-08/firstStop.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;A random tree with a random hill in the background.
+&lt;img alt="random" src="/assets/images/2017-11-08/randomShot1.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;A random hill with weird looking clouds
+&lt;img alt="random" src="/assets/images/2017-11-08/randomShot2.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;The not-random sun behind weird clouds
+&lt;img alt="random" src="/assets/images/2017-11-08/randomShot3.jpg"&gt;&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;It was super fun and I think that I will keep on doing this again and
+again. Next goal is Mysore. :-P&lt;/p&gt;
+&lt;p&gt;I used OsmAnd to record the GPS traces and it was absolutely
+phenomenal. I had no idea it would be this amazing.&lt;/p&gt;
+&lt;p&gt;Here is what OsmAnd has to say about the trip with Speed (Orange) and
+Altitude (Blue) on the same graph. I think we can clearly see the
+correlation between the altitude and the speed.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="osmand Overall" src="/assets/images/2017-11-08/osmandBoth.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;The speed part of the GPX track is also interesting which says my
+maximum speed was 46 km/hr which was just for a short while during the
+starting phase. I think this was during the descend from my hostel
+towards jalahalli via Tumkur Road.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="osmand speed" src="/assets/images/2017-11-08/osmandSpeed.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Here is
+the
+&lt;a href="/assets/files/2017-11-08/2017-11-02_05-39_Thu(100KM).gpx"&gt;GPX track&lt;/a&gt;
+just in case.&lt;/p&gt;
+&lt;p&gt;p.s. this was longer than I expected it would be. :-P&lt;/p&gt;</content><category term="Cycling"></category><category term="Travel"></category></entry><entry><title>My First Bicycle</title><link href="/blog/My-First-Bicycle.html" rel="alternate"></link><published>2017-10-26T00:00:00+05:30</published><updated>2017-10-26T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-10-26:/blog/My-First-Bicycle.html</id><summary type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I have been interested in bicycles for as long as I can remember. For
+me they represent the ultimate form of Open Design and practical implications of
+physics in a much more feel-able way. &lt;/p&gt;
+&lt;p&gt;However I never owned a geared bicycle and ever since I moved to
+Bangalore I …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I have been interested in bicycles for as long as I can remember. For
+me they represent the ultimate form of Open Design and practical implications of
+physics in a much more feel-able way. &lt;/p&gt;
+&lt;p&gt;However I never owned a geared bicycle and ever since I moved to
+Bangalore I wanted to buy one but my parents would not let me buy one
+(I was also asking them to buy me one since I am not financially
+independent yet!). So after I got the job I saved up enough money to
+buy one myself. :-)&lt;/p&gt;
+&lt;h3&gt;The Cycle&lt;/h3&gt;
+&lt;p&gt;I bought a Schwinn Searcher from a friend of mine. This dude studied
+at IISc and he was going home after completing his studies. He had
+really cared for this cycle. It is about 5 years old but the
+components are really really well maintained. &lt;/p&gt;
+&lt;p&gt;Here it is. &lt;img alt="My cycle pic" src="/assets/images/2017-10-26/normal.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Before riding a premium cycle I had no idea that premium bicycles were
+this good. The first time I rode a premium bicycle was a btwin
+original. I had borrowed this cycle from Arun and we went for a 50k
+ride. This was also the first time I rode more than 10k. This was
+probably one of the reasons why I decided to buy this one.&lt;/p&gt;
+&lt;p&gt;I went on 2 moderate distance rides (around 50k) with Arun. It was
+fun. We went to Hesarghatta both times.&lt;/p&gt;
+&lt;p&gt;I ride the cycle mostly for commute. I travel to and from college on
+this thing.&lt;/p&gt;
+&lt;p&gt;Riding in Bangalore is difficult especially with the stop-and-go
+traffic. It takes a lot of courage to ride The bicycle in the city. I
+still haven't mustered the courage to ride it after sundown. To be
+honest I don't have safety lights. (yet) :-P&lt;/p&gt;
+&lt;p&gt;I am not riding the cycle as much currently because Bangalore is
+having unpredictable and heavy rainfalls. While I do not mind getting
+wet in the occasional downpour; I do mind getting my bicycle all wet
+and dirty. Its a pain to clean and its not good for the parts.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Riding in the rain with no mudguards is just plain stupid.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The amount of water these tires can fling even on a wet road with no
+puddles is just amazing. On top of that the roads here are not too
+good so we do have a LOT of puddles. I didn't learn this fact until
+it was too late. I was caught off guard with no mud-guards
+twice. Thank You Bangalore for such a weird and unpredictable
+weather.&lt;/p&gt;
+&lt;p&gt;On a positive note I do realize exactly how important mudguards are! :-P&lt;/p&gt;
+&lt;h3&gt;Cleaning The Bike&lt;/h3&gt;
+&lt;p&gt;One of the best things about owning a bicycle is the mechanical
+part. You get to be the cool mechanic and fix any major/minor issues
+that crop up. I do enjoy the occasional indexing and lubrication
+rituals of the gears. But, after buying this I had never really washed
+the bicycle completely. So on a random Sunday I got to it gave the
+cycle a complete thorough wash. It was amazing. I opened up the chains
+(without any tools; thanks to the master links...) and opened up the
+wheels and stuff. It was a great experience.&lt;/p&gt;
+&lt;p&gt;I kept the chain out to dry for about 2 days but I had to install it
+for a quick ride because of an emergency.&lt;/p&gt;
+&lt;p&gt;I was planning to clean the chain using kerosene but that never
+happened. It's on my to-do list though!&lt;/p&gt;
+&lt;p&gt;Here is a photo of the process. &lt;img alt="Cleaning" src="/assets/images/2017-10-26/clean.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;blue&gt; What is so special about cycling anyway ?  &lt;/blue&gt; &lt;/p&gt;
+&lt;p&gt;Even though I can not put a finger on it, I would it is the open-ness
+of the whole system that appeals to me at a personal level. As much as
+I know myself I would pick a not-so-good but hack-able piece to
+technology over a amazing but not hack-able piece of technology on any
+fine day. Whats the point of using something if you can not figure
+out how it works and tweak it.&lt;/p&gt;
+&lt;p&gt;The best thing about bicycles is the open-ness. I think I have used
+thus term quite a lot and not explained it. By open-ness I mean that I
+can open up the bicycle completely using just a bunch of Allen
+Keys. Moreover I can put it back together and it will work just like
+before. I can also buy switch random parts and things will still
+work. For any repair big or small the only limiting factor is the
+availability of relevant tools. If the tools are present then I can
+fix almost any foreseeable issue with the bicycle be it a tube puncture
+repair or changing the drive-train.&lt;/p&gt;
+&lt;p&gt;What I am saying is that a bicycle gives me a sense of
+self-sufficiency. Also it has the right mixture of diy-ness that I
+find most lacking in people now a days. (:-P)&lt;/p&gt;
+&lt;p&gt;Also I am a person knows that Climate Change is real and we need to do as much as we can so that the future is brighter. So it's not a bad feeling to know that every-time I am riding the cycle I am actually making a positive impact in the world. &lt;/p&gt;
+&lt;p&gt;I also try to inspire kids/their parents to take cycling seriously because its good for the environment and for the body.&lt;/p&gt;
+&lt;p&gt;Last but not the least. Cycling is a great exercise. &lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Start Cycling; Keep Cycling. &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;p.s. I do not click many photos and my phone camera was behaving funny with a custom ROM so the pics can be a bit off! &lt;/p&gt;</content><category term="Cycling"></category></entry><entry><title>The Big Picture</title><link href="/blog/The-Big-Picture.html" rel="alternate"></link><published>2017-10-07T00:00:00+05:30</published><updated>2017-10-07T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-10-07:/blog/The-Big-Picture.html</id><summary type="html">&lt;h3&gt;Disclaimer&lt;/h3&gt;
+&lt;p&gt;This post is the result of a train of thought that was triggered by an
+interaction with a human being who is very close to me.&lt;/p&gt;
+&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;So this person recently got into a really cool training program in a
+cutting edge scientific field that is conducted by a …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Disclaimer&lt;/h3&gt;
+&lt;p&gt;This post is the result of a train of thought that was triggered by an
+interaction with a human being who is very close to me.&lt;/p&gt;
+&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;So this person recently got into a really cool training program in a
+cutting edge scientific field that is conducted by a very reputed
+scientific organization.  Now somehow the details about this training
+program is not too common, most students have no idea that such a program even
+exists.&lt;/p&gt;
+&lt;p&gt;So I ask this guy that who else applied along with him from his
+college, to which he replied that he didn't know and he did not tell
+his friends about the opportunity because that would increase the
+competition and lower his chances of getting into the program.&lt;/p&gt;
+&lt;h3&gt;Okay! So now what ?!&lt;/h3&gt;
+&lt;p&gt;So I have a huge problem with the last statement and that train of
+thought in general. I don't think that that type of thinking has any
+place in the House of God (or the Temple of Science).&lt;/p&gt;
+&lt;p&gt;I believe that science is carried forward by people who recognize that
+no-matter what; if you are not good enough, you simply are not good
+enough. There is no second thought about it.&lt;/p&gt;
+&lt;p&gt;Let me clarify further.&lt;/p&gt;
+&lt;p&gt;What does an &lt;em&gt;ideal&lt;/em&gt; scientist do when he/she realizes that her theory
+is wrong ?  Do they get defensive about it or do they try to come up
+with a theory that is not wrong ?&lt;/p&gt;
+&lt;p&gt;My point is scientists recognize their short-comings and take
+constructive steps to remedy that. Not the other way around where you
+get ahead of others by eliminating the competition. In science
+competition is healthy. Just look at the world and you will find
+devastating examples of what happens when competition is not there.&lt;/p&gt;
+&lt;p&gt;And not just scientists; I think every &lt;em&gt;healthy&lt;/em&gt; adult should practice
+this form of thinking because this form of thinking takes the focus
+off of the thing which one can not control which in this case is
+whether they will get into the program or not and moves the focus to
+the thing that they can indeed control which is the amount of effort
+they put into developing their skills so that they may get into the
+program.&lt;/p&gt;
+&lt;p&gt;In less words it moves the focus from external factors that are not
+under your control and lets the person focus on themselves so that
+there is more room for personal development. If there is no more room
+for personal development then we have already lost the battle. :-P&lt;/p&gt;
+&lt;p&gt;While sabotaging the competition may seem like a great thing to do; it
+is mostly a very un-sustainable thing to do. You may win the battle
+but you will lose the war.&lt;/p&gt;
+&lt;h3&gt;For the love of science!!&lt;/h3&gt;
+&lt;p&gt;I love science. I love science to a fault. I am willing to do anything
+in the interest of science.  I can confidently say that if I were in a
+situation where I had to choose between myself and another person for
+a scientific position of critical importance, I would choose the
+better person out of the two of us.&lt;/p&gt;
+&lt;p&gt;Given a specific job, I would rather have the best possible person for
+the job, do the job rather than myself do the job if I am not
+qualified enough for the job. This might look like a passive stance
+but this kind of thinking means that in most cases I work really hard
+to make sure that when the time comes I am the best possible person to
+do a job.&lt;/p&gt;
+&lt;p&gt;The reason for all of this is that there is a bigger picture to all of
+this than just who gets to do the job. That is the progress of the
+scientific community. It doesn't matter who does the job as long as the
+job gets done with the best possible quality. &lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;So what I am trying to say is this; If you are incompetent; then you
+are incompetent and your level of competency does not depend on your
+opponents competency.&lt;/p&gt;
+&lt;p&gt;Work on yourself and let the rest sort itself out. :-)&lt;/p&gt;</content><category term="Meta"></category></entry><entry><title>First Job at Azim Premji Foundation</title><link href="/blog/My-First-Job-at-Azim-Premji-Foundation.html" rel="alternate"></link><published>2017-09-20T00:00:00+05:30</published><updated>2017-09-20T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-09-20:/blog/My-First-Job-at-Azim-Premji-Foundation.html</id><summary type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I got my first job on 14th April 2017. The company was Azim Premji
+Foundation and my official role was that of a Technical Consultant. In
+this I was to train the content-development team on the Ins and Outs
+of Linux and be a guide on their whole learning …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I got my first job on 14th April 2017. The company was Azim Premji
+Foundation and my official role was that of a Technical Consultant. In
+this I was to train the content-development team on the Ins and Outs
+of Linux and be a guide on their whole learning process. It was quite
+an educative experience. The contract ended on 14th
+September 2017. But I can still visit the office and work on random
+stuff (yes! the manager is really cool!!) =P&lt;/p&gt;
+&lt;p&gt;Now that this thing has ended I think I am in a decent-ish position to
+evaluate it. Honestly speaking I had no idea that my first job would
+be something like as meaningful (to me) as this one. I think I am
+lucky than most people because I got to work with technology that I
+love and I got to do things that I love as well (I have a small crush
+on teaching; mostly because I have had bad teachers and think we need
+to fix that!!) and on top of that; my job required me to learn more
+and more about Linux and to push the boundary. That is like icing on
+the cake.&lt;/p&gt;
+&lt;p&gt;This job shattered all the preconceived notions I had about jobs and how things worked and about "making an impact".&lt;/p&gt;
+&lt;h3&gt;Making an impact&lt;/h3&gt;
+&lt;p&gt;I used to be very short-sighted about the "impact" of a job. I always
+thought that "impact" is something that you can see from day 1. After
+working for 6 months I realized that it is rarely the case. I learned
+that good things take time and most of the time this time is because
+there are lots of situations that can arise in the middle; issues that
+were not thought off before. Also when you are working with other
+people then its very easy to get lost in the complexities of life and
+work. But this does not mean the all the small things do not matter;
+it's just that these things take time.&lt;/p&gt;
+&lt;h3&gt;Teachers and Learning&lt;/h3&gt;
+&lt;p&gt;Learning can be an intimidating task for anyone and mostly because
+learning something absolutely new can make you feel incompetent and
+that is not a good feeling. On top of that learning something new
+takes a considerable amount of mental energy and time.&lt;/p&gt;
+&lt;p&gt;That being said I do not find any difficulty in learning something
+absolutely new (this is only the case if I am learning something that
+I want to learn); but what surprised me was that even though the
+teachers I worked with were very dedicated to the cause but still they
+had difficulty getting used to the learning mentality. This used to
+bother me at times initially but then I had a breakthrough.&lt;/p&gt;
+&lt;p&gt;I am 20 years old now and I would say that I am pretty lucky since I
+have a lot less things to worry about than most people. But the people
+I worked with are not so lucky. What I was not accounting for is the
+fact that they are not as free as I am. I was judging them based from
+a very narrow perspective and not accounting for the fact that they
+were more than just people with a job. They have families to take care
+of of, jobs to worry about and hundreds of other things that need
+their immediate attention.  So expecting that they would be "perfect
+learners" was an unwise thing to do. Thus even though the team was a
+very motivated team; they have every right to feel unmotivated from
+time to time.&lt;/p&gt;
+&lt;p&gt;I always had a personal grudge against teachers mostly because I had
+seen teachers who were not too up to date with the current material
+and teachers who did not inspire curiosity and teachers who would
+rather say the wrong thing than accept that they do not know
+something. I always thought that managers were evil mostly because how
+my friends (who were working) always complained about how their
+managers were not good and did not know enough about the underlying
+system and stuff (I am generalizing here a bit).&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Enter the APF team&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The group I worked with included three high school teachers and a
+Project Manager. The most striking thing about them is their open-ness
+to new experience and their humility. This is a bunch of people who
+are in their 40s; who are very good at what they do (being teachers)
+and who are actively learning new technology that would enhance 
+the quality of education for high school students. Let that sink in
+for a moment.&lt;/p&gt;
+&lt;p&gt;We had one person there who not only used GNU/Linux so that she could
+create localized materials for her students (in Kannada); she was also
+an active contributor the the GeoGebra community. This is the best
+manifestation of the FOSS movement. I have been associated with FSMK
+for over a year and this is the first time got to experience the real
+power of FOSS for someone outside the developer community. I always
+failed to grasp the idea that FOSS is about the people and not the
+technology completely until this experience. After this realized the
+full depth of the idea (I think so). There is also another person who
+was teaching himself woodworking, calculus and German just because he
+wanted to learn them.&lt;/p&gt;
+&lt;p&gt;I am interested in Theoretical Computer Science and that requires some
+decent amount of mathematics which is not covered in great detail in
+my course. So I planned to take an online course and teach myself the
+maths. BUT I never did, I was too scared of finding out that I was too
+dumb or too stupid or too late to the party. In the course of these 6
+months my interaction with these amazing people inspired me to enroll 
+in 4 MOOC while the usual FSMK work and APF work and College course
+work (more about this later). I realized that its better to start than
+to just wait for the correct time. It is tough to maintain all of
+these at the same time (I think I am in-eligible for some of the MOOC
+certificates right now; but the certificates are not why I started
+taking the MOOC in the first place :-) )&lt;/p&gt;
+&lt;h3&gt;Life-skills&lt;/h3&gt;
+&lt;p&gt;Let's talk about humility and open-ness. I was under the impression
+that I got this job because I was supposed to know GNU/Linux and teach
+them that so I was very scared that a scenario might arise where I
+would be out of my depth. As a result I spent a lot of time doing some
+homework about the stuff that I had planned to cover that day. But I
+got hit by a brick when I saw how open these teachers were about not
+knowing stuff. I had never witnessed that amount of acknowledgment
+from a teacher about their own shortcomings. Now I think that I am a
+lot more open about acknowledging my own short-comings as a
+person. Furthermore I think that it is a disservice to yourself if you
+can not acknowledge your own shortcomings because we can grow as a
+person only when we acknowledge that there is more room to grow as a
+person in the first place.&lt;/p&gt;
+&lt;h3&gt;Linux&lt;/h3&gt;
+&lt;p&gt;This section will be very short! =P&lt;/p&gt;
+&lt;p&gt;I had no idea that a Linux based OS was so complex. I always knew that
+Linux was complex but I assumed that the OS built around would be
+simple enough. Nah! not true again!!! I couldn't be more
+wrong. Compiling LFS (Linux From Scratch) has been third best thing in this exercise.&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;At the end of these 6 amazing months I think its fair enough to say that
+I learned a lot more from them than they learned from me and looking back I had no idea that this exercise would be such an amazing educational experience for me. Being teachers is not easy and I have more respect for teachers now than I did about 6 months ago. Sure there can be good teachers and bad teachers (I hope I was a good one!) but apart from the one-off cases; most of the teachers are amazing.&lt;/p&gt;</content><category term="Misc"></category><category term="Work"></category><category term="Linux"></category></entry><entry><title>Experience with Data Recovery</title><link href="/blog/Experience-With-Data-Recovery.html" rel="alternate"></link><published>2017-07-20T00:00:00+05:30</published><updated>2017-07-20T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-07-20:/blog/Experience-With-Data-Recovery.html</id><summary type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;We have been planning to set up a backup utility on Sam but somehow we never quite got around to actually doing it. However this week we finally decided to do it. We decided to try out &lt;a href="https://obnam.org/"&gt;Obnam&lt;/a&gt;. Things were going good until we needed to delete a directory …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;We have been planning to set up a backup utility on Sam but somehow we never quite got around to actually doing it. However this week we finally decided to do it. We decided to try out &lt;a href="https://obnam.org/"&gt;Obnam&lt;/a&gt;. Things were going good until we needed to delete a directory.&lt;/p&gt;
+&lt;p&gt;Now remember that this directory was local directory and not a system directory unlike how the name suggests. The directory in question is "mnt".
+Yes we had set up the dummy directory tree for experimenting with the backup tool and it had a mnt in it. &lt;/p&gt;
+&lt;p&gt;So for deleting it Sohom should have typed &lt;code&gt;rm -rf mnt&lt;/code&gt; but he typed &lt;code&gt;rm -rf /mnt&lt;/code&gt;.
+Notice the '/' in the command he typed, Yep true story. Completely nuked all the mounted partitions.&lt;/p&gt;
+&lt;h3&gt;Some Context&lt;/h3&gt;
+&lt;p&gt;Okay we need some context. This is how &lt;code&gt;lsblk&lt;/code&gt; looks on our system (Sam). The important partitions that store all the main data and media (movies and documentaries and Pics) are the &lt;code&gt;/dev/sda4&lt;/code&gt; and &lt;code&gt;/dev/sda5&lt;/code&gt;. As both of them were mounted they both were completely deleted. &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/assets/images/2017-07-20/lsblk.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Aftermath&lt;/h3&gt;
+&lt;p&gt;Okay so what DID we lose ?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ALL  work related files ( We keep a work_space directory )&lt;/li&gt;
+&lt;li&gt;ALL of our music collection ( this is what keeps us sane )&lt;/li&gt;
+&lt;li&gt;ALL of our Pictures that we had saved ( nice memories :'(  )&lt;/li&gt;
+&lt;li&gt;ALL of our documents ( amazing PDF files, and books and other stuff )&lt;/li&gt;
+&lt;li&gt;ALL of our documentaries and movies.&lt;/li&gt;
+&lt;li&gt;All of our MOOC videos that we had saved. &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So yeah! EVERYTHING. &lt;/p&gt;
+&lt;h3&gt;The Recovery&lt;/h3&gt;
+&lt;p&gt;Now this is where we will trace the thinking that enabled us to get back almost all of our data. &lt;/p&gt;
+&lt;p&gt;The First thing that we did was to unmount the affected partitions so as stop any data being overwritten on those partitions. This would increase the chances of getting most of our data back.&lt;/p&gt;
+&lt;p&gt;Then we downloaded &lt;a href="https://www.cgsecurity.org/wiki/PhotoRec"&gt;PhotoRec&lt;/a&gt; ( in Arch it is packaged with the TestDisk package ). We started PhotoRec form the terminal and followed the steps to select the partition we wanted to recover and also we had to select the partition where the recovered files would be stored. It is recommended that the partition where you store the recovered files and the partition that you want to recover data from be different partitions as this would reduce the chances of the old data being overwritten. &lt;/p&gt;
+&lt;p&gt;Now after this you might see something like this. &lt;img alt="PhotoRec working" src="/assets/images/2017-07-20/photorec.png"&gt;.&lt;/p&gt;
+&lt;p&gt;This is normal and its perfectly fine to go about doing other stuff that you have to do while PhotoRec "walks" through the file-system and recovers files for you. &lt;/p&gt;
+&lt;p&gt;One thing we should remember is that the recovery part is not such a pain! PhotoRec is amazing and does an amazing job. The main pain is actually picking up the files that YOU want from he whole bunch of recovered files. This is because since PhotoRec does not have any method to determine if the deleted files were deleted accidentally or not, it recovers everything that was deleted and not overwritten. Thus we have a LOT of work to do. &lt;/p&gt;
+&lt;h3&gt;After the recovery&lt;/h3&gt;
+&lt;p&gt;These are some of the things that PhotoRec does after recovering the files.
+&lt;em&gt; Stores everything under multiple &lt;code&gt;recup_dir.&amp;lt;integer&amp;gt;&lt;/code&gt; directories. It looks something like this &lt;img alt="recovery ls" src="/assets/images/2017-07-20/reco_ls.png"&gt;
+&lt;/em&gt; Every file other than text files are properly named. As in other than text files all other files have their proper extensions. Thus PhotoRec doesn't mix up JPEG and PNG files.
+&lt;em&gt; That being said it does mix up text files. As in recovered Java files would sometimes be named as C++ header files and so on.
+&lt;/em&gt; PhotoRec also recovers ELF files which are nothing but executable files.&lt;/p&gt;
+&lt;p&gt;&lt;blue&gt; How do we go about sorting this mess ?&lt;/blue&gt;
+Our first idea was to launch &lt;a href="http://nongnu.org/ranger/"&gt;ranger&lt;/a&gt; and inspect every single directory and delete directories if the contents didn't feel too important. Something like this.
+&lt;img alt="manual" src="/assets/images/2017-07-20/manual.png"&gt;
+But there was a major flaw with this system. There were a lot of files in those directories and going through each one of them would be a tedious and a very very stupid thing to do. &lt;/p&gt;
+&lt;p&gt;So we started making a list of the things that we lost and the things that we wanted to recovered from the mess. We figured that if we could not remember something that we had lost them we probably did not need it in the first place. Thus we figured that the most important stuff in the data directory ware the scripts that we had written for our Arch System. We also realized that we mostly needed text files from this partition recovery so we could delete all the non-text files and thus we started this massive assault on all non essential files. &lt;/p&gt;
+&lt;p&gt;Initially we were writing scripts like &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="k"&gt;for&lt;/span&gt; file in &lt;span class="o"&gt;(&lt;/span&gt;find ./ -name &lt;span class="s2"&gt;&amp;quot;*.jar&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; rm -vf &lt;span class="nv"&gt;$file&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; end&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which worked like a charm. &lt;/p&gt;
+&lt;p&gt;Then we figured out the better version of this command i.e.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ find ./ -name &lt;span class="s2"&gt;&amp;quot;*.jar&amp;quot;&lt;/span&gt; -delete
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which does the same thing; finds files with a particular extension (JAR files in this case) and delete them.&lt;/p&gt;
+&lt;p&gt;We kept doing this for a huge set of files unless we were left with only text files.&lt;/p&gt;
+&lt;p&gt;Now we needed to get all the DOCX files so we did this&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="k"&gt;for&lt;/span&gt; file in &lt;span class="o"&gt;(&lt;/span&gt;find ./ -name &lt;span class="s2"&gt;&amp;quot;*.docx&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; cp -c &lt;span class="nv"&gt;$file&lt;/span&gt; ../store&lt;span class="p"&gt;;&lt;/span&gt; end&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now comes the interesting part. Remember those scripts that we wrote. We had a fairly good idea about the contents of those scripts so we could do a recursive grep with those keywords and BOOM! &lt;/p&gt;
+&lt;p&gt;This is the first script which had a lot of i3-msg in it.
+&lt;img alt="i3-msg" src="/assets/images/2017-07-20/i3-msg.png"&gt;
+Similarly we found all the other scripts.&lt;/p&gt;
+&lt;h3&gt;The Second Partition&lt;/h3&gt;
+&lt;p&gt;This partition posed a different kind of challenge. We wanted to recover all the images that we had. We ran PhotoRec with the option that would only recover only the JPEG files. But even after that we had about 12000+ JPEG files. Moreover inspection with ranger showed that certain files were duplicated. To confirm our assumption we check the MD5 hash of two such files.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="duplicate" src="/assets/images/2017-07-20/dupli.png"&gt;&lt;/p&gt;
+&lt;p&gt;As you can see both the files have the same MD5 hash and thus they are essentially the same files. So now we needed a script that would sort the duplicate files out.&lt;/p&gt;
+&lt;p&gt;We followed the instructions in this article and installed fdupes and let it run amok and remove all the duplicate files we had.&lt;/p&gt;
+&lt;p&gt;Also we figured out that there were a lot of files that were 100kb or less. These were thumbnail files we believe. So we did this&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ find ./ -size -100k -delete
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and all of them annoying files were gone. :p&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;&lt;blue&gt; So what is the takeaway from all this ? &lt;/blue&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;OFFSITE BACKUPS&lt;/li&gt;
+&lt;li&gt;ALWAYS HAVE BACKUPS BEFORE PLAYING WITH IMPORTANT FILES&lt;/li&gt;
+&lt;li&gt;PhotoRec is pretty awesome&lt;/li&gt;
+&lt;/ul&gt;</content><category term="CS"></category><category term="Linux"></category></entry><entry><title>The Mess Called Kolkata</title><link href="/blog/The-Mess-called-Kolkata.html" rel="alternate"></link><published>2017-05-14T00:00:00+05:30</published><updated>2017-05-14T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-05-14:/blog/The-Mess-called-Kolkata.html</id><summary type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I live in Bangalore as I am studying in Bangalore. My hometown is Kolkata. I keep visiting Kolkata after every semester break which generally lasts for about 3 weeks. &lt;/p&gt;
+&lt;h3&gt;The Decision&lt;/h3&gt;
+&lt;p&gt;Coming to Bangalore was not a properly planned decision. Generally moving to a new city for studies is …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I live in Bangalore as I am studying in Bangalore. My hometown is Kolkata. I keep visiting Kolkata after every semester break which generally lasts for about 3 weeks. &lt;/p&gt;
+&lt;h3&gt;The Decision&lt;/h3&gt;
+&lt;p&gt;Coming to Bangalore was not a properly planned decision. Generally moving to a new city for studies is an option that everyone has discussed at-least once in their lifetime. But not me. During my higher-secondary schooling the I had never even entertained the idea of moving to another city to study for an under-graduate degree. Planning and coming to Bangalore happened in like 1 month after my CBSE class 12 results. &lt;/p&gt;
+&lt;h3&gt;The Blunder&lt;/h3&gt;
+&lt;p&gt;During my school days I was always a shut-in and avoided social interactions mostly because I did not like my friends too much to begin with and because I really did not fit into any particular group of friends. So to keep my young self sane I said to myself that I would find a decent friends circle when I would be in college and we all would hang out in and around Kolkata and explore the city and what not.&lt;/p&gt;
+&lt;p&gt;So when coming to Bangalore was finalized I felt very happy. I was very very exited. But that excitement was short-lived. &lt;/p&gt;
+&lt;h3&gt;The Realization&lt;/h3&gt;
+&lt;p&gt;After living in Bangalore I soon realized how much I liked Kolkata; not because I did not like Bangalore but because I did not know Kolkata well enough to begin with. These two cities are very very different and comparing them is like comparing apples to bananas. I also felt extremely saddened by the fact that all those plans I made about exploring kolkata and stuff were just 3000 kilometers away. &lt;/p&gt;
+&lt;h3&gt;The Remedy&lt;/h3&gt;
+&lt;p&gt;So I decided that every semester break when I go to Kolkata I will trek around the city exploring it. My idea of exploring a city is somewhat different from the conventional idea. I do not follow a guide to the "must-visit" attractions. Rather I pick a place and I walk. I love walking. Walking through a city opens up another dimension to the city (I think this is because since you are slow while walking you can observe more stuff ?!! (maybe idk! ))&lt;/p&gt;
+&lt;h3&gt;The Plan&lt;/h3&gt;
+&lt;p&gt;The plan is that there is no plan. I will pick up a place and I will borrow a camera and I will walk and then I will write about it and I will post it with the pics. Most of the pics will have some description about the image and what not. This is gonna be Kolkata as I see it. &lt;/p&gt;
+&lt;p&gt;Also I may end up using a cycle for my trek but I am not so sure about the cycle. &lt;/p&gt;</content><category term="Travel"></category></entry><entry><title>The Universe and The Reason</title><link href="/blog/The-Universe-and-the-reason.html" rel="alternate"></link><published>2017-04-10T00:00:00+05:30</published><updated>2017-04-10T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-04-10:/blog/The-Universe-and-the-reason.html</id><summary type="html">&lt;h3&gt;Disclaimer&lt;/h3&gt;
+&lt;p&gt;This essay originated as a series of messages between me and my friend
+(you know who you are). After that I took those messages and worked on
+this for quite some time to polish then into something presentable.&lt;/p&gt;
+&lt;h3&gt;Okay! so ...&lt;/h3&gt;
+&lt;p&gt;Humanity always had a special relationship with reason. Reason …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Disclaimer&lt;/h3&gt;
+&lt;p&gt;This essay originated as a series of messages between me and my friend
+(you know who you are). After that I took those messages and worked on
+this for quite some time to polish then into something presentable.&lt;/p&gt;
+&lt;h3&gt;Okay! so ...&lt;/h3&gt;
+&lt;p&gt;Humanity always had a special relationship with reason. Reason is the
+main keyword here. It is reason that ultimately led to all beautiful
+inventions and achievements. Since the early days humanity has always
+strived to find the reasons that could describe the naturally occurring
+phenomenon around them.&lt;/p&gt;
+&lt;p&gt;Man was (still is to some extent) a very inquisitive animal. If it
+were up to man then he would have had proper reasons for all the
+things that he could have had reasons for and he strived to achieve
+just that. Reasons that described everything man could think of. He
+strived for perfection. This led to a problem. Man did not realize
+that some (read: most) answers are not ultimate. They all lead to
+further questions that need further answers and the cycle repeats all
+over again. Soon enough humanity had more questions than it had
+answers for.&lt;/p&gt;
+&lt;p&gt;This created a feeling of helpless-ness. Man could not stomach the
+fact that he did not have all the answers. Man could not stomach the
+fact that he was not in control. Man could not acknowledge the
+universe. Man felt helpless and insignificant (as he rightly is). Man
+was (still is) a bit &lt;em&gt;too&lt;/em&gt; arrogant. A bit too arrogant for his own
+good. Man was/is a bit too fragile to accept the responsibility for
+all of his actions. He needs a scapegoat; not only to blame someone in
+case anything goes wrong but also someone to take the credit in case
+something goes right. This way man can escape accountability for his
+actions and blame god for the good and the bad. He needs to believe
+in something far bigger, far greater than himself to make him feel a
+part of something bigger than himself, to define a sense of purpose
+for him.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;THIS&lt;/em&gt; led to the invention of god. GOD was someone who had all the
+answers; someone so perfect that he could take all the bashing and all
+the accusations of lowly creatures like ourselves and still be
+righteous. God was (still is) the perfect scapegoat for man. This is
+what messed up the world as we know it.&lt;/p&gt;
+&lt;p&gt;We were born a Hindu, raised a Hindu, trained a Hindu until we realized
+what we were and we gave up our religion. We are atheists now. &lt;/p&gt;
+&lt;p&gt;Giving up our religion was not a great feeling, there was some form of
+disconnect. This is when we realized the power of the "believing in
+something bigger than our-self" feeling. That feeling is a powerful
+feeling; it keeps you sane.&lt;/p&gt;
+&lt;p&gt;So what do we believe in ??  &lt;/p&gt;
+&lt;p&gt;We believe in the Universe and the Reason. The universe because it is
+what is ultimately out there and reason because reason is how we
+insignificant beings communicate with the universe. The universe is
+the ultimate form of power and grandeur. Nothing can beat its elegance
+and majesticity. When compared to the universe, you truly are
+insignificant. And that is also a powerful feeling.&lt;/p&gt;</content><category term="Meta"></category></entry><entry><title>The beginning</title><link href="/blog/The-beginning.html" rel="alternate"></link><published>2017-03-25T00:00:00+05:30</published><updated>2017-03-25T00:00:00+05:30</updated><author><name>Sohom</name></author><id>tag:None,2017-03-25:/blog/The-beginning.html</id><summary type="html">&lt;h3&gt;Whats the plan&lt;/h3&gt;
+&lt;p&gt;The plan is that there is no plan. We have no idea about what we are trying to do here. All we know is that we will be writing about &lt;em&gt;stuff&lt;/em&gt; and then publish them. &lt;/p&gt;
+&lt;p&gt;This was planned for a long time and we have really put …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Whats the plan&lt;/h3&gt;
+&lt;p&gt;The plan is that there is no plan. We have no idea about what we are trying to do here. All we know is that we will be writing about &lt;em&gt;stuff&lt;/em&gt; and then publish them. &lt;/p&gt;
+&lt;p&gt;This was planned for a long time and we have really put in a lot of effort into making this blog (mostly the design part).&lt;/p&gt;
+&lt;p&gt;Also since we are learning LISP and like parentheses (&lt;a href="https://github.com/Fuco1/smartparens"&gt;smartparens&lt;/a&gt; in &lt;a href="https://www.gnu.org/software/emacs/"&gt;Emacs&lt;/a&gt; makes you love parentheses!!) we will be using a lot of parentheses. &lt;/p&gt;
+&lt;p&gt;We switched from using vim to using Emacs full time. Vim is good; Emacs is just waaay better (we are not kidding; there will be a post on this some time later ;-) )&lt;/p&gt;
+&lt;p&gt;&lt;blue&gt; Source of inspiration &lt;/blue&gt;
+Just like any other human out there this blog was also inspired by certain individuals out there&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://systemreboot.net"&gt;Arun Issac&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://solariiknight.org"&gt;Anand Issac&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://cosmobird.github.io"&gt;Cosmobird&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Meta"></category></entry></feed>

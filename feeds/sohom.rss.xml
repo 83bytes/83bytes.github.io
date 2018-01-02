@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"><channel><title>SignalShore - Sohom</title><link>/</link><description></description><lastBuildDate>Wed, 20 Dec 2017 00:00:00 +0530</lastBuildDate><item><title>Scheme - Part 3 - Higher Order Procedures (intro)</title><link>/blog/Scheme-Part-3.html</link><description>&lt;h3&gt;Higher Order procedures&lt;/h3&gt;
+&lt;p&gt;&lt;s&gt;Lisp is a functional programming language&lt;/s&gt;&lt;/p&gt;
+&lt;p&gt;Lisp is a &lt;a href="https://en.wikipedia.org/wiki/Metaprogramming"&gt;Metaprogramming Language&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Actually, I really don't know what Lisp is myself and I'm just trying
+to figure it out; so the answer to the question "What programming
+paradigm does Lisp fall into ?" will have to wait for some …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Wed, 20 Dec 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-12-20:/blog/Scheme-Part-3.html</guid><category>CS</category><category>Scheme</category></item><item><title>Scheme - Part 2 - Expressions and Evaluations</title><link>/blog/Scheme-Part-2.html</link><description>&lt;h3&gt;S-expressions&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/S-expression"&gt;S-expressions&lt;/a&gt; or Sexprs or Symbolic Expressions are used to
+represented list like data. This was invented for and popularized by
+LISP. Lisp stands for LISt Processing. &lt;/p&gt;
+&lt;p&gt;A list looks like this &lt;code&gt;(x y ... z)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;A list can be made up of other lists as well. Like so &lt;code&gt;(x (a …&lt;/code&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Thu, 30 Nov 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-11-30:/blog/Scheme-Part-2.html</guid><category>CS</category><category>Scheme</category></item><item><title>Scheme - Part 1 - Wishful Thinking and Abstraction</title><link>/blog/Scheme-Part-1.html</link><description>&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I started
+learning
+&lt;a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)"&gt;LISP&lt;/a&gt;
+(actually a dialect of LISP
+called
+&lt;a href="https://en.wikipedia.org/wiki/Scheme_(programming_language)"&gt;Scheme&lt;/a&gt;)
+about 1 year back. The inspiration for learning Scheme was that it is
+a completely new programming paradigm
+i.e. &lt;a href="https://en.wikipedia.org/wiki/Functional_programming"&gt;functional programming&lt;/a&gt; language
+and I wanted to learn a non-Object-Oriented programming
+language. Anyway, so I looked
+at
+&lt;a href="https://en.wikipedia.org/wiki/Haskell_(programming_language)"&gt;Haskell …&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Mon, 20 Nov 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-11-20:/blog/Scheme-Part-1.html</guid><category>CS</category><category>Scheme</category></item><item><title>My First 100km Bicycle Ride</title><link>/blog/My-First-100-km-Bicycle-Ride.html</link><description>&lt;p&gt;Last Thursday (2 November, 2017) I completed my longest cycling ride
+(yet!). It was tiring and awesome at the same time. It took 7 hours to
+complete that too with multiple stops in the middle of the ride.&lt;/p&gt;
+&lt;h3&gt;The Motivation&lt;/h3&gt;
+&lt;p&gt;I've been planning to do a 100k ride for a …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Wed, 08 Nov 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-11-08:/blog/My-First-100-km-Bicycle-Ride.html</guid><category>Cycling</category><category>Travel</category></item><item><title>My First Bicycle</title><link>/blog/My-First-Bicycle.html</link><description>&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I have been interested in bicycles for as long as I can remember. For
+me they represent the ultimate form of Open Design and practical implications of
+physics in a much more feel-able way. &lt;/p&gt;
+&lt;p&gt;However I never owned a geared bicycle and ever since I moved to
+Bangalore I …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Thu, 26 Oct 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-10-26:/blog/My-First-Bicycle.html</guid><category>Cycling</category></item><item><title>The Big Picture</title><link>/blog/The-Big-Picture.html</link><description>&lt;h3&gt;Disclaimer&lt;/h3&gt;
+&lt;p&gt;This post is the result of a train of thought that was triggered by an
+interaction with a human being who is very close to me.&lt;/p&gt;
+&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;So this person recently got into a really cool training program in a
+cutting edge scientific field that is conducted by a …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Sat, 07 Oct 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-10-07:/blog/The-Big-Picture.html</guid><category>Meta</category></item><item><title>First Job at Azim Premji Foundation</title><link>/blog/My-First-Job-at-Azim-Premji-Foundation.html</link><description>&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I got my first job on 14th April 2017. The company was Azim Premji
+Foundation and my official role was that of a Technical Consultant. In
+this I was to train the content-development team on the Ins and Outs
+of Linux and be a guide on their whole learning …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Wed, 20 Sep 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-09-20:/blog/My-First-Job-at-Azim-Premji-Foundation.html</guid><category>Misc</category><category>Work</category><category>Linux</category></item><item><title>Experience with Data Recovery</title><link>/blog/Experience-With-Data-Recovery.html</link><description>&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;We have been planning to set up a backup utility on Sam but somehow we never quite got around to actually doing it. However this week we finally decided to do it. We decided to try out &lt;a href="https://obnam.org/"&gt;Obnam&lt;/a&gt;. Things were going good until we needed to delete a directory …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Thu, 20 Jul 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-07-20:/blog/Experience-With-Data-Recovery.html</guid><category>CS</category><category>Linux</category></item><item><title>The Mess Called Kolkata</title><link>/blog/The-Mess-called-Kolkata.html</link><description>&lt;h3&gt;Prologue&lt;/h3&gt;
+&lt;p&gt;I live in Bangalore as I am studying in Bangalore. My hometown is Kolkata. I keep visiting Kolkata after every semester break which generally lasts for about 3 weeks. &lt;/p&gt;
+&lt;h3&gt;The Decision&lt;/h3&gt;
+&lt;p&gt;Coming to Bangalore was not a properly planned decision. Generally moving to a new city for studies is …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Sun, 14 May 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-05-14:/blog/The-Mess-called-Kolkata.html</guid><category>Travel</category></item><item><title>The Universe and The Reason</title><link>/blog/The-Universe-and-the-reason.html</link><description>&lt;h3&gt;Disclaimer&lt;/h3&gt;
+&lt;p&gt;This essay originated as a series of messages between me and my friend
+(you know who you are). After that I took those messages and worked on
+this for quite some time to polish then into something presentable.&lt;/p&gt;
+&lt;h3&gt;Okay! so ...&lt;/h3&gt;
+&lt;p&gt;Humanity always had a special relationship with reason. Reason …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Mon, 10 Apr 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-04-10:/blog/The-Universe-and-the-reason.html</guid><category>Meta</category></item><item><title>The beginning</title><link>/blog/The-beginning.html</link><description>&lt;h3&gt;Whats the plan&lt;/h3&gt;
+&lt;p&gt;The plan is that there is no plan. We have no idea about what we are trying to do here. All we know is that we will be writing about &lt;em&gt;stuff&lt;/em&gt; and then publish them. &lt;/p&gt;
+&lt;p&gt;This was planned for a long time and we have really put …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Sohom</dc:creator><pubDate>Sat, 25 Mar 2017 00:00:00 +0530</pubDate><guid isPermaLink="false">tag:None,2017-03-25:/blog/The-beginning.html</guid><category>Meta</category></item></channel></rss>
